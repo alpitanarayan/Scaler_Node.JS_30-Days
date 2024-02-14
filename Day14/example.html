@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caching Middleware Test</title>
+</head>
+<body>
+    <h1>Caching Middleware Test</h1>
+    <p>This page is for testing the caching middleware.</p>
+
+    <script>
+        // Example AJAX request to test caching middleware
+        function makeRequest() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/example", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log("Response from server:", xhr.responseText);
+                }
+            };
+            xhr.send();
+        }
+
+        // Make a request, cache the response, and make the same request again within the cache expiration time.
+        setTimeout(function() {
+            console.log("Making request 1...");
+            makeRequest();
+        }, 1000); // Wait 1 second
+
+        setTimeout(function() {
+            console.log("Making request 2...");
+            makeRequest();
+        }, 3000); // Wait 3 seconds
+
+        // Make a request, cache the response, wait for cache expiration, and make the same request again.
+        setTimeout(function() {
+            console.log("Making request 3...");
+            makeRequest();
+        }, 6000); // Wait 6 seconds
+
+        setTimeout(function() {
+            console.log("Making request 4...");
+            makeRequest();
+        }, 9000); // Wait 9 seconds
+    </script>
+</body>
+</html>
