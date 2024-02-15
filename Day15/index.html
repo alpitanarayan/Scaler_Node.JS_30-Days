@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Express Logging Middleware Test Page</title>
+</head>
+<body>
+  <h1>Express Logging Middleware Test Page</h1>
+  <form id="requestForm">
+    <label for="method">HTTP Method:</label>
+    <select id="method" name="method">
+      <option value="GET">GET</option>
+      <option value="POST">POST</option>
+      <option value="PUT">PUT</option>
+      <option value="DELETE">DELETE</option>
+    </select>
+    <label for="url">URL:</label>
+    <input type="text" id="url" name="url" value="http://localhost:3000">
+    <button type="submit">Send Request</button>
+  </form>
+
+  <script>
+    document.getElementById('requestForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const method = document.getElementById('method').value;
+      const url = document.getElementById('url').value;
+
+      fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: 'Test message' })
+      })
+      .then(response => {
+        console.log('Response:', response);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    });
+  </script>
+</body>
+</html>
