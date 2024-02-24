@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   username: String,
-  email: String
+  email: String,
+  age: Number
 });
 
 const User = mongoose.model('User', userSchema);
@@ -21,4 +22,4 @@ async function addUserToDatabase(user) {
   }
 }
 
-addUserToDatabase({ username: 'john_doe', email: 'john@example.com' });
+addUserToDatabase( {username: 'Anand', email: 'anand@gmail.com', age: 24});
