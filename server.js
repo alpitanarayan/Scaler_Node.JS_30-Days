@@ -1,35 +1,104 @@
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/Scaler_30_Days_NodeJS')
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('Error connecting to MongoDB:', err));
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    validate: {
-      validator: function(value) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-      },
-      message: 'Invalid email format'
-    }
+const app = express();
+const PORT = 3000;
+
+mongoose
+  .connect("mongodb://127.0.0.1:27017/myapp")
+  .then(() => {
+    console.log("MongoDB connected successfully");
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
+
+const productSchema = new mongoose.Schema({
+  name: String,
+  category: String,
+  price: Number,
+});
+
+const Product = mongoose.model("Product", productSchema);
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+async function createProduct(data) {
+  try {
+    const product = await Product.create(data);
+    return product;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+async function getAllProducts() {
+  try {
+    const products = await Product.find({});
+    return products;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+async function updateProduct(id, newData) {
+  try {
+    const product = await Product.findByIdAndUpdate(id, newData, { new: true });
+    return product;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+async function deleteProduct(id) {
+  try {
+    const product = await Product.findByIdAndDelete(id);
+    return product;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+
+app.post("/products", async (req, res) => {
+  try {
+    const product = await createProduct(req.body);
+    res.status(201).json(product);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
-const User = mongoose.model('User', userSchema);
 
-function addUserWithValidation(user) {
-  const newUser = new User(user);
-  newUser.save()
-    .then(() => {
-      console.log('User added successfully');
-    })
-    .catch(err => {
-      console.error('Error adding user:', err.message);
-    });
-}
-addUserWithValidation({ username: 'john_doe', email: 'john@gmail.com' });
+app.get("/products", async (req, res) => {
+  try {
+    const products = await getAllProducts();
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put("/products/:id", async (req, res) => {
+  try {
+    const product = await updateProduct(req.params.id, req.body);
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete("/products/:id", async (req, res) => {
+  try {
+    const product = await deleteProduct(req.params.id);
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});
